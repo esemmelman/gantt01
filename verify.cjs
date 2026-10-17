@@ -7,6 +7,19 @@ const server = http.createServer((req,res)=>{const file=req.url==='/'?'index.htm
 try{
  await page.goto(process.env.TEST_URL||'http://localhost:'+server.address().port);await page.waitForFunction(()=>document.querySelector('#status').textContent==='All changes saved');
  const baseline=await page.locator('.task-row').count();assert(baseline>=8);
+ assert.equal(await page.locator('header,.stats,.level-dot').count(),0);
+ let parentId=null,rootId=null;
+ for(let level=1;level<=4;level++){
+  if(level===1)await page.locator('#add').click();else await page.locator(`[data-child="${parentId}"]`).click();
+  assert.equal(await page.locator('[name=parent_id]').inputValue(),parentId||'');
+  await page.locator('[name=title]').fill(`Hierarchy verification ${level}`);await page.locator('#save').click();
+  const name=page.getByRole('button',{name:`Hierarchy verification ${level}`,exact:true});await name.waitFor();
+  const row=name.locator('..').locator('..');const id=await row.getAttribute('data-id');rootId ||= id;
+  await page.locator(`[data-sibling="${id}"]`).click();assert.equal(await page.locator('[name=parent_id]').inputValue(),parentId||'');await page.locator('#cancel').click();
+  if(level===4)assert.equal(await page.locator(`[data-child="${id}"]`).count(),0);
+  parentId=id;
+ }
+ await page.locator(`[data-edit="${rootId}"]`).click();page.once('dialog',d=>d.accept());await page.locator('#delete').click();await page.waitForFunction(n=>document.querySelectorAll('.task-row').length===n,baseline);
  await page.locator('[data-toggle]').first().click();assert(await page.locator('.task-row').count()<baseline);await page.locator('#expand').click();assert.equal(await page.locator('.task-row').count(),baseline);
  await page.locator('#search').fill('Stakeholder');assert.equal(await page.locator('.task-row').count(),4);await page.locator('#search').fill('');
  await page.locator('#add').click();await page.locator('[name=title]').fill('Verification task');await page.locator('[name=progress]').fill('45');await page.locator('#save').click();await page.waitForFunction(n=>document.querySelectorAll('.task-row').length===n,baseline+1);
