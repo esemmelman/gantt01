@@ -1,6 +1,6 @@
 {
   "name": "gantt01",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "private": true,
   "scripts": {
     "test": "node verify.cjs"

@@ -84,7 +84,7 @@ $('#chart').addEventListener('pointermove',e=>{
  if((!bar&&!dateCell)||e.buttons||moving||busy){hideBarHover();return;}
  const t=bar?tasks.find(t=>t.id===bar.dataset.bar):null,hoverDate=dateCell?.dataset.date||t?.start_date;if(!hoverDate){hideBarHover();return;}
  hideBarHover();const n=diff(hoverDate,today());
- hoverTip.textContent=(t?nodeLabel(t)+' · ':'')+n+' days.';hoverTip.hidden=false;(bar||dateCell).setAttribute('aria-describedby','bar-tooltip');
+ hoverTip.textContent=t?nodeLabel(t)+' · Start: '+n+' days. · End: '+diff(t.end_date,today())+' days.':n+' days.';hoverTip.hidden=false;(bar||dateCell).setAttribute('aria-describedby','bar-tooltip');
  hoverTip.style.left=Math.max(8,Math.min(e.clientX+14,window.innerWidth-hoverTip.offsetWidth-8))+'px';hoverTip.style.top=Math.max(8,Math.min(e.clientY+18,window.innerHeight-hoverTip.offsetHeight-8))+'px';
  const inner=$('.chart-inner'),day=inner.querySelector('.day[data-date="'+hoverDate+'"]');
  const line=document.createElement('div');line.className='hover-date-line';line.style.width=unit+'px';line.style.left=(day.getBoundingClientRect().left-inner.getBoundingClientRect().left)+'px';inner.append(line);day.classList.add('hover-date');
