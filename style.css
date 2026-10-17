@@ -10,3 +10,5 @@ main{padding-top:24px}.toggle{font-size:23px;color:#64718e;line-height:1}.toggle
 .chart-head,.time-head{height:78px}.days{height:51px}.day{padding-top:5px;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:18px}.weekday{font-size:13px;font-weight:600}.date-number{font-size:13px}
 
 .no-date{flex-direction:row;align-items:center;gap:10px}.no-date input{width:18px;height:18px;accent-color:#6271e9}.undated{display:block;padding:8px 12px;color:#8c95aa;font-size:14px}input:disabled{background:#f3f4f8;color:#a1a8b8}
+
+.toggle{font-size:15px}@media(max-width:650px){.toggle{font-size:14px}}
