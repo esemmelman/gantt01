@@ -18,7 +18,7 @@ The SQL schema is in `schema.sql` for reference and fresh installations; it has 
 
 ## Publishing
 
-On startup, the timeline shows tasks whose date range overlaps today through ten days ahead, with their ancestors retained. This also applies to dated DayFlow entries, which are fetched while Dayflow remains initially collapsed. Show all reveals expired, undated, and later tasks; Current + 10 days restores the filter. A node's focused Gantt view shows its complete subtree. Run `node verify-window.cjs` to verify date boundaries and ancestor visibility.
+On startup, all first-level nodes are shown collapsed. Current + 10 days filters tasks whose date range overlaps today through ten days ahead, with their ancestors retained. This also applies to dated DayFlow entries, which are fetched while Dayflow remains initially collapsed. Show all reveals expired, undated, and later tasks; Current + 10 days restores the filter. A node's focused Gantt view shows its complete subtree. Run `node verify-window.cjs` to verify date boundaries and ancestor visibility.
 
 Click a first-level node name to open its adjacent Doc / Gantt / Check / Edit menu. Doc stores sanitized rich text with headings, emphasis, and lists. Check stores editable checkbox items. Each screen has a Save button and warns before discarding unsaved changes. Gantt expands and focuses the selected node, and Edit opens the node editor. Documents and checklists use `gantt01_20261017_node_content` in bnaimitzvah and are deleted with their node. Run `node verify-node-tools.cjs` to verify menu behavior, formatting, persistence, checklist editing, and mobile layout using a temporary node that is removed afterward.
 
@@ -29,3 +29,5 @@ GitHub Pages serves the root of the `main` branch. Push changes to `main` to pub
 ## Verification
 
 Run `npm ci` and `npm test` with Microsoft Edge installed. The browser check exercises the connected database, creates a temporary task, verifies persistence and editing, drags its dates, and deletes it. It also checks collapse, search, CSV export, zoom, and mobile layout. For production verification, set `TEST_URL` to the live URL before running the test.
+
+On Android, the timeline is rendered as a document-style list of nodes with dates beside them. Hierarchy controls, completion, node menus, and DayFlow times remain available. Other platforms retain the Gantt chart. Run `node verify-android.cjs` for Android emulation and desktop comparison.
