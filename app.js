@@ -13,7 +13,7 @@ const shift = (s,n) => iso(new Date(+date(s)+n*DAY));
 const diff = (a,b) => Math.round((date(a)-date(b))/DAY);
 const today = () => new Intl.DateTimeFormat('en-CA').format(new Date());
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let tasks=[], collapsed=new Set(), editing=null, busy=false, unit=30, origin, count, moving=false, initialLoad=true,focusedNode=null;
+let tasks=[], collapsed=new Set(), editing=null, busy=false, unit=30, origin, count, moving=false, initialLoad=true,focusedNode=null,nearTermOnly=true;
 async function request(path='',method='GET',body) {
  const response=await fetch(API+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',Prefer:'return=representation'},body:body?JSON.stringify(body):undefined});
  if(!response.ok){let e=await response.json().catch(()=>({}));throw Error(e.message||`Request failed (${response.status})`);}
@@ -21,11 +21,12 @@ async function request(path='',method='GET',body) {
 }
 function error(e){$('#error').textContent=e.message;$('#error').hidden=false;$('#status').textContent='Connection issue';}
 async function load(){try{
- const imported=tasks.filter(t=>t.external);const [saved,completion]=await Promise.all([request('?select=*&order=sort_order.asc,created_at.asc'),completionRequest('?select=*')]);tasks=saved;dayflowCompleted=new Map(completion.map(t=>[t.task_id,t.completed]));
+ const firstLoad=initialLoad;const imported=tasks.filter(t=>t.external);const [saved,completion]=await Promise.all([request('?select=*&order=sort_order.asc,created_at.asc'),completionRequest('?select=*')]);tasks=saved;dayflowCompleted=new Map(completion.map(t=>[t.task_id,t.completed]));
  if(initialLoad)tasks.filter(isDayflow).forEach(t=>collapsed.add(t.id));
  const parents=new Set(tasks.filter(isDayflow).map(t=>t.id));tasks.push(...imported.filter(t=>parents.has(t.parent_id)));
- $('#status').textContent='All changes saved';$('#error').hidden=true;render();if(initialLoad){$('#today').click();initialLoad=false;}
- if(tasks.some(t=>isDayflow(t)&&!collapsed.has(t.id)))await loadDayflow();
+ $('#status').textContent='All changes saved';$('#error').hidden=true;
+ if(((firstLoad||nearTermOnly)&&parents.size)||tasks.some(t=>isDayflow(t)&&!collapsed.has(t.id)))await loadDayflow();
+ render();if(firstLoad){$('#today').click();initialLoad=false;if($('#error').hidden)$('#status').textContent='All changes saved';}
  }catch(e){error(e);if(!tasks.length)$('#chart').innerHTML='<div class="empty">Could not load the timeline. Use Refresh to try again.</div>';}}
 async function loadDayflow(){
  if(dayflowLoading)return;const parents=tasks.filter(isDayflow);if(!parents.length)return;dayflowLoading=true;$('#status').textContent='Loading DayFlow…';
@@ -33,7 +34,7 @@ async function loadDayflow(){
  const entries=[];for(let offset=0;;offset+=1000){const response=await fetch(DAYFLOW_API+'?select=id,title,date,start_time,color&date=gte.'+today()+'&order=date.asc,start_time.asc.nullsfirst,id.asc&limit=1000&offset='+offset,{headers:{apikey:DAYFLOW_KEY}});if(!response.ok)throw Error('DayFlow could not load. Click Refresh to retry.');const page=await response.json();entries.push(...page);if(page.length<1000)break;}
  const scroll=$('#chart').scrollLeft,previousOrigin=origin;
  tasks=tasks.filter(t=>!t.external);for(const parent of parents)for(const entry of entries.filter(e=>e.date>=today()))tasks.push({id:'dayflow:'+parent.id+':'+encodeURIComponent(entry.id),parent_id:parent.id,title:entry.title,start_date:entry.date,end_date:entry.date,color:entry.color,progress:dayflowCompleted.get('dayflow:'+parent.id+':'+encodeURIComponent(entry.id))?100:0,sort_order:0,external:true,start_time:entry.start_time});
- render();$('#chart').scrollLeft=scroll+diff(previousOrigin,origin)*unit;$('#status').textContent='DayFlow synced · '+entries.length+' entries';$('#error').hidden=true;
+ render();$('#chart').scrollLeft=scroll+(previousOrigin?diff(previousOrigin,origin)*unit:0);$('#status').textContent='DayFlow synced · '+entries.length+' entries';$('#error').hidden=true;
  }catch(e){error(e);}finally{dayflowLoading=false;}
 }
 setInterval(()=>{if(!document.hidden&&tasks.some(t=>isDayflow(t)&&!collapsed.has(t.id)))loadDayflow();},60000);
@@ -43,20 +44,22 @@ $('#chart').addEventListener('change',async e=>{const input=e.target.closest('[d
 function nodeLabel(t){if(!t.external)return t.title;const time=t.start_time;if(!time)return t.title+' · All day';const [h,m]=time.split(':').map(Number);return t.title+' · '+(h%12||12)+':'+String(m).padStart(2,'0')+' '+(h>=12?'PM':'AM');}
 function depth(t){let n=1;while(t.parent_id){t=tasks.find(x=>x.id===t.parent_id);if(!t)break;n++;if(n>5)break;}return n;}
 function descendants(id){let result=[];for(const t of tasks.filter(x=>x.parent_id===id))result.push(t.id,...descendants(t.id));return result;}
-function scopedTasks(){if(!focusedNode)return tasks;const ids=new Set([focusedNode,...descendants(focusedNode)]);return tasks.filter(t=>ids.has(t.id));}
-function visible(){const rows=[],query=$('#search').value.toLowerCase().trim();const matches=new Set();if(query)for(const t of tasks.filter(t=>t.title.toLowerCase().includes(query))){matches.add(t.id);let p=t.parent_id;while(p){matches.add(p);p=tasks.find(t=>t.id===p)?.parent_id;}}
- function walk(parent,level){for(const t of tasks.filter(t=>t.parent_id===parent).sort((a,b)=>Number(isDayflow(a))-Number(isDayflow(b))||a.title.localeCompare(b.title,undefined,{sensitivity:'base',numeric:true})||a.id.localeCompare(b.id))){if(level===1&&focusedNode&&t.id!==focusedNode)continue;if(query&&!matches.has(t.id))continue;rows.push({...t,level});if(query||!collapsed.has(t.id))walk(t.id,level+1);}}walk(null,1);return rows;}
+function scopedTasks(){if(!focusedNode){if(!nearTermOnly)return tasks;const ids=nearTermIds();return tasks.filter(t=>ids.has(t.id));}const ids=new Set([focusedNode,...descendants(focusedNode)]);return tasks.filter(t=>ids.has(t.id));}
+function nearTermIds(){const ids=new Set(),start=today(),end=shift(start,10);for(const t of tasks){if(!t.start_date||!t.end_date||t.start_date>end||t.end_date<start)continue;ids.add(t.id);let p=t.parent_id;while(p){ids.add(p);p=tasks.find(t=>t.id===p)?.parent_id;}}return ids;}
+function visible(){const eligible=nearTermOnly&&!focusedNode?nearTermIds():null;const rows=[],query=$('#search').value.toLowerCase().trim();const matches=new Set();if(query)for(const t of tasks.filter(t=>t.title.toLowerCase().includes(query))){matches.add(t.id);let p=t.parent_id;while(p){matches.add(p);p=tasks.find(t=>t.id===p)?.parent_id;}}
+ function walk(parent,level){for(const t of tasks.filter(t=>t.parent_id===parent).sort((a,b)=>Number(isDayflow(a))-Number(isDayflow(b))||a.title.localeCompare(b.title,undefined,{sensitivity:'base',numeric:true})||a.id.localeCompare(b.id))){if(eligible&&!eligible.has(t.id))continue;if(level===1&&focusedNode&&t.id!==focusedNode)continue;if(query&&!matches.has(t.id))continue;rows.push({...t,level});if(query||!collapsed.has(t.id))walk(t.id,level+1);}}walk(null,1);return rows;}
 function render(){
  hideBarHover();
  nodeTools.closeMenu();
  if(focusedNode&&!tasks.some(t=>t.id===focusedNode&&!t.parent_id))focusedNode=null;
+ $('#show-all').hidden=!!focusedNode;$('#show-all').textContent=nearTermOnly?'Show all':'Current + 10 days';$('#show-all').setAttribute('aria-pressed',String(nearTermOnly));
  $('#gantt-scope').hidden=!focusedNode;$('#scope-title').textContent=tasks.find(t=>t.id===focusedNode)?.title||'';
  const dates=scopedTasks().flatMap(t=>[t.start_date,t.end_date]).filter(Boolean);dates.push(today());dates.sort();origin=shift(dates[0],-5);count=Math.max(60,diff(dates.at(-1),origin)+15,diff(today(),origin)+Math.ceil($('#chart').clientWidth/unit));const width=count*unit;
  const rows=visible();let days='',months='';let last='';for(let i=0;i<count;i++){const s=shift(origin,i),d=date(s),month=d.toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});if(month!==last){let span=0;while(i+span<count&&date(shift(origin,i+span)).getUTCMonth()===d.getUTCMonth())span++;months+=`<span style="display:inline-block;width:${span*unit}px;padding-left:10px;border-right:1px solid #e9ecf3">${esc(month)}</span>`;last=month;}days+=`<div class="day ${[0,6].includes(d.getUTCDay())?'weekend':''} ${s===today()?'is-today':''}" style="width:${unit}px" data-date="${s}" aria-label="${s}"><span class="weekday">${unit>=16||d.getUTCDate()===1?'SMTWTFS'[d.getUTCDay()]:''}</span><span class="date-number">${unit>=16?d.getUTCDate():(d.getUTCDate()===1?'1':'')}</span></div>`;}
  const marker=diff(today(),origin)*unit+unit/2;
  $('#chart').innerHTML=`<div class="chart-inner" style="--day-width:${unit}px"><div class="chart-head"><div class="left-head"><span>TASK NAME</span></div><div class="time-head" style="width:${width}px"><div class="month">${months}</div><div class="days">${days}</div></div></div>${rows.map(t=>{
  const has=isDayflow(t)||tasks.some(x=>x.parent_id===t.id);return `<div class="task-row" data-id="${t.id}"><div class="task-left" style="padding-left:${12+(t.level-1)*19}px"><button class="toggle ${has?'':'leaf-chevron'}" data-toggle="${t.id}" aria-label="${has?(collapsed.has(t.id)?'Expand':'Collapse'):'No children for'} ${esc(t.title)}" ${has?`aria-expanded="${!collapsed.has(t.id)}"`:'disabled'}>${has&&!collapsed.has(t.id)?'⌄':'›'}</button><input class="complete-toggle" type="checkbox" data-complete="${t.id}" aria-label="Completed: ${esc(t.title)}" ${t.progress===100?'checked':''}><button class="task-name ${t.level===1?'root-name':''}" data-edit="${t.id}" title="${esc(t.title)} · Level ${t.level}">${esc(nodeLabel(t))}</button>${!t.external?`<button class="sibling-add" data-sibling="${t.id}" title="Add node at level ${t.level}" aria-label="Add sibling to ${esc(t.title)}">+</button>${t.level<4?`<button class="child-add" data-child="${t.id}" title="Add child at level ${t.level+1}" aria-label="Add subtask to ${esc(t.title)}">↳+</button>`:''}`:'<span class="source-label" title="From DayFlow">↗</span>'}</div><div class="track" style="width:${width}px"><div class="today-line" style="left:${marker}px"></div>${t.start_date&&t.end_date?`<div class="bar ${t.progress===100?'completed':''}" data-bar="${t.id}" style="left:${diff(t.start_date,origin)*unit}px;width:${(diff(t.end_date,t.start_date)+1)*unit}px;--color:${/^#[0-9a-f]{6}$/i.test(t.color)?t.color:'#6172f3'}"><div class="bar-fill" style="width:${t.progress}%"></div><span class="bar-label">${esc(nodeLabel(t))}</span>${!t.external?'<div class="resize" aria-label="Resize task"></div>':''}</div>`:''}</div></div>`;
- }).join('')}${!rows.length?'<div class="empty">'+(tasks.length?'No matching tasks.':'Your next project starts here. Add your first task above.')+'</div>':''}</div>`;
+ }).join('')}${!rows.length?'<div class="empty">'+(tasks.length?(nearTermOnly&&!focusedNode?'No tasks active today or in the next 10 days. Use Show all to see every node.':'No matching tasks.'):'Your next project starts here. Add your first task above.')+'</div>':''}</div>`;
 }
 function openEditor(id=null,parent=null){if(tasks.find(t=>t.id===id)?.external)return;editing=id;const t=tasks.find(t=>t.id===id),form=$('#task-form');form.reset();$('#form-error').textContent='';$('#dialog-title').textContent=t?'Edit node':`New node · Level ${parent?depth(tasks.find(t=>t.id===parent))+1:1}`;$('#delete').hidden=!t;
  const excluded=new Set(id?[id,...descendants(id)]:[]);form.elements.parent_id.innerHTML='<option value="">None — top-level task</option>'+tasks.filter(x=>!x.external&&!excluded.has(x.id)&&depth(x)<4).map(x=>`<option value="${x.id}">${esc('　'.repeat(depth(x)-1)+x.title)}</option>`).join('');
@@ -86,6 +89,7 @@ $('#chart').addEventListener('pointermove',e=>{
  const line=document.createElement('div');line.className='hover-date-line';line.style.width=unit+'px';line.style.left=(day.getBoundingClientRect().left-inner.getBoundingClientRect().left)+'px';inner.append(line);day.classList.add('hover-date');
 });
 $('#chart').addEventListener('pointerleave',hideBarHover);$('#chart').addEventListener('pointerdown',hideBarHover);$('#chart').addEventListener('scroll',hideBarHover);
+$('#show-all').onclick=()=>{nearTermOnly=!nearTermOnly;render();$('#today').click();};
 $('#all-nodes').onclick=()=>{focusedNode=null;$('#search').value='';render();$('#today').click();};
 const nodeTools=setupNodeTools({api:API,key:KEY,getNode:id=>tasks.find(t=>t.id===id),onEdit:openEditor,onGantt:async id=>{
  const node=tasks.find(t=>t.id===id);if(!node)return;focusedNode=id;$('#search').value='';tasks.filter(t=>!t.parent_id&&t.id!==id).forEach(t=>collapsed.add(t.id));collapsed.delete(id);descendants(id).forEach(child=>collapsed.delete(child));render();if(isDayflow(node))await loadDayflow();
