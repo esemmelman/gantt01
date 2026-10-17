@@ -24,3 +24,5 @@ body,body *{font-weight:700!important}
 .bar{overflow:visible}.bar-label{width:max-content;max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap;z-index:1;color:#253047;text-shadow:0 0 3px white,0 0 3px white;pointer-events:none}.bar-fill{border-radius:5px}.resize{border-radius:0 5px 5px 0;z-index:2}
 
 .bar{background:color-mix(in srgb,var(--color) 20%,white);box-shadow:none}.bar-fill{background:color-mix(in srgb,var(--color) 10%,transparent)}.resize{background:rgba(255,255,255,.35)}
+
+.source-label{color:#8995b2;padding:0 8px;font-size:14px}.bar:has(.bar-label):not(:has(.resize)){cursor:default}
