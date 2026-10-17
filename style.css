@@ -22,3 +22,5 @@ body,body *{font-weight:700!important}
 .task-row{height:auto;min-height:36px;align-items:stretch}.task-left{min-height:36px;padding-top:4px;padding-bottom:4px}.task-name{min-width:0;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.35}.track{height:auto;min-height:36px}.bar{top:50%;transform:translateY(-50%)}
 
 .bar{overflow:visible}.bar-label{width:max-content;max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap;z-index:1;color:#253047;text-shadow:0 0 3px white,0 0 3px white;pointer-events:none}.bar-fill{border-radius:5px}.resize{border-radius:0 5px 5px 0;z-index:2}
+
+.bar{background:color-mix(in srgb,var(--color) 20%,white);box-shadow:none}.bar-fill{background:color-mix(in srgb,var(--color) 10%,transparent)}.resize{background:rgba(255,255,255,.35)}
