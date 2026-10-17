@@ -18,3 +18,5 @@ main{padding-top:24px}.toggle{font-size:23px;color:#64718e;line-height:1}.toggle
 .hover-date-line{background:rgba(83,103,229,.15);border-left:1px solid rgba(83,103,229,.35);border-right:1px solid rgba(83,103,229,.35)}
 
 body,body *{font-weight:700!important}
+
+.task-row{height:auto;min-height:36px;align-items:stretch}.task-left{min-height:36px;padding-top:4px;padding-bottom:4px}.task-name{min-width:0;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.35}.track{height:auto;min-height:36px}.bar{top:50%;transform:translateY(-50%)}
