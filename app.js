@@ -13,7 +13,7 @@ const shift = (s,n) => iso(new Date(+date(s)+n*DAY));
 const diff = (a,b) => Math.round((date(a)-date(b))/DAY);
 const today = () => new Intl.DateTimeFormat('en-CA').format(new Date());
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let tasks=[], collapsed=new Set(), editing=null, busy=false, unit=30, origin, count, moving=false, initialLoad=true,focusedNode=null,nearTermOnly=true;
+let tasks=[], collapsed=new Set(), editing=null, busy=false, unit=30, origin, count, moving=false, initialLoad=true,focusedNode=null,nearTermOnly=false;
 async function request(path='',method='GET',body) {
  const response=await fetch(API+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',Prefer:'return=representation'},body:body?JSON.stringify(body):undefined});
  if(!response.ok){let e=await response.json().catch(()=>({}));throw Error(e.message||`Request failed (${response.status})`);}
