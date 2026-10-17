@@ -90,7 +90,7 @@ $('#chart').addEventListener('pointermove',e=>{
 });
 $('#chart').addEventListener('pointerleave',hideBarHover);$('#chart').addEventListener('pointerdown',hideBarHover);$('#chart').addEventListener('scroll',hideBarHover);
 $('#show-all').onclick=()=>{nearTermOnly=!nearTermOnly;render();$('#today').click();};
-$('#all-nodes').onclick=()=>{focusedNode=null;$('#search').value='';render();$('#today').click();};
+$('#all-nodes').onclick=()=>{focusedNode=null;$('#search').value='';collapsed=new Set(tasks.filter(t=>isDayflow(t)||tasks.some(child=>child.parent_id===t.id)).map(t=>t.id));render();$('#today').click();};
 const nodeTools=setupNodeTools({api:API,key:KEY,getNode:id=>tasks.find(t=>t.id===id),onEdit:openEditor,onGantt:async id=>{
  const node=tasks.find(t=>t.id===id);if(!node)return;focusedNode=id;$('#search').value='';tasks.filter(t=>!t.parent_id&&t.id!==id).forEach(t=>collapsed.add(t.id));collapsed.delete(id);descendants(id).forEach(child=>collapsed.delete(child));render();if(isDayflow(node))await loadDayflow();
  const row=[...document.querySelectorAll('.task-row')].find(el=>el.dataset.id===id);if(row)$('#chart').scrollTop=Math.max(0,row.offsetTop-$('.chart-head').offsetHeight);$('#chart').scrollLeft=Math.max(0,diff(node.start_date||today(),origin)*unit-100);
