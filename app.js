@@ -13,7 +13,7 @@ const shift = (s,n) => iso(new Date(+date(s)+n*DAY));
 const diff = (a,b) => Math.round((date(a)-date(b))/DAY);
 const today = () => new Intl.DateTimeFormat('en-CA').format(new Date());
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let tasks=[], collapsed=new Set(), editing=null, busy=false, unit=30, origin, count, moving=false, initialLoad=true;
+let tasks=[], collapsed=new Set(), editing=null, busy=false, unit=30, origin, count, moving=false, initialLoad=true,focusedNode=null;
 async function request(path='',method='GET',body) {
  const response=await fetch(API+path,{method,headers:{apikey:KEY,'Content-Type':'application/json',Prefer:'return=representation'},body:body?JSON.stringify(body):undefined});
  if(!response.ok){let e=await response.json().catch(()=>({}));throw Error(e.message||`Request failed (${response.status})`);}
@@ -43,12 +43,15 @@ $('#chart').addEventListener('change',async e=>{const input=e.target.closest('[d
 function nodeLabel(t){if(!t.external)return t.title;const time=t.start_time;if(!time)return t.title+' · All day';const [h,m]=time.split(':').map(Number);return t.title+' · '+(h%12||12)+':'+String(m).padStart(2,'0')+' '+(h>=12?'PM':'AM');}
 function depth(t){let n=1;while(t.parent_id){t=tasks.find(x=>x.id===t.parent_id);if(!t)break;n++;if(n>5)break;}return n;}
 function descendants(id){let result=[];for(const t of tasks.filter(x=>x.parent_id===id))result.push(t.id,...descendants(t.id));return result;}
+function scopedTasks(){if(!focusedNode)return tasks;const ids=new Set([focusedNode,...descendants(focusedNode)]);return tasks.filter(t=>ids.has(t.id));}
 function visible(){const rows=[],query=$('#search').value.toLowerCase().trim();const matches=new Set();if(query)for(const t of tasks.filter(t=>t.title.toLowerCase().includes(query))){matches.add(t.id);let p=t.parent_id;while(p){matches.add(p);p=tasks.find(t=>t.id===p)?.parent_id;}}
- function walk(parent,level){for(const t of tasks.filter(t=>t.parent_id===parent)){if(query&&!matches.has(t.id))continue;rows.push({...t,level});if(query||!collapsed.has(t.id))walk(t.id,level+1);}}walk(null,1);return rows;}
+ function walk(parent,level){for(const t of tasks.filter(t=>t.parent_id===parent)){if(level===1&&focusedNode&&t.id!==focusedNode)continue;if(query&&!matches.has(t.id))continue;rows.push({...t,level});if(query||!collapsed.has(t.id))walk(t.id,level+1);}}walk(null,1);return rows;}
 function render(){
  hideBarHover();
  nodeTools.closeMenu();
- const dates=tasks.flatMap(t=>[t.start_date,t.end_date]).filter(Boolean);dates.push(today());dates.sort();origin=shift(dates[0],-5);count=Math.max(60,diff(dates.at(-1),origin)+15,diff(today(),origin)+Math.ceil($('#chart').clientWidth/unit));const width=count*unit;
+ if(focusedNode&&!tasks.some(t=>t.id===focusedNode&&!t.parent_id))focusedNode=null;
+ $('#gantt-scope').hidden=!focusedNode;$('#scope-title').textContent=tasks.find(t=>t.id===focusedNode)?.title||'';
+ const dates=scopedTasks().flatMap(t=>[t.start_date,t.end_date]).filter(Boolean);dates.push(today());dates.sort();origin=shift(dates[0],-5);count=Math.max(60,diff(dates.at(-1),origin)+15,diff(today(),origin)+Math.ceil($('#chart').clientWidth/unit));const width=count*unit;
  const rows=visible();let days='',months='';let last='';for(let i=0;i<count;i++){const s=shift(origin,i),d=date(s),month=d.toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});if(month!==last){let span=0;while(i+span<count&&date(shift(origin,i+span)).getUTCMonth()===d.getUTCMonth())span++;months+=`<span style="display:inline-block;width:${span*unit}px;padding-left:10px;border-right:1px solid #e9ecf3">${esc(month)}</span>`;last=month;}days+=`<div class="day ${[0,6].includes(d.getUTCDay())?'weekend':''} ${s===today()?'is-today':''}" style="width:${unit}px" data-date="${s}" aria-label="${s}"><span class="weekday">${unit>=16||d.getUTCDate()===1?'SMTWTFS'[d.getUTCDay()]:''}</span><span class="date-number">${unit>=16?d.getUTCDate():(d.getUTCDate()===1?'1':'')}</span></div>`;}
  const marker=diff(today(),origin)*unit+unit/2;
  $('#chart').innerHTML=`<div class="chart-inner" style="--day-width:${unit}px"><div class="chart-head"><div class="left-head"><span>TASK NAME</span></div><div class="time-head" style="width:${width}px"><div class="month">${months}</div><div class="days">${days}</div></div></div>${rows.map(t=>{
@@ -83,8 +86,9 @@ $('#chart').addEventListener('pointermove',e=>{
  const line=document.createElement('div');line.className='hover-date-line';line.style.width=unit+'px';line.style.left=(day.getBoundingClientRect().left-inner.getBoundingClientRect().left)+'px';inner.append(line);day.classList.add('hover-date');
 });
 $('#chart').addEventListener('pointerleave',hideBarHover);$('#chart').addEventListener('pointerdown',hideBarHover);$('#chart').addEventListener('scroll',hideBarHover);
+$('#all-nodes').onclick=()=>{focusedNode=null;$('#search').value='';render();$('#today').click();};
 const nodeTools=setupNodeTools({api:API,key:KEY,getNode:id=>tasks.find(t=>t.id===id),onEdit:openEditor,onGantt:async id=>{
- const node=tasks.find(t=>t.id===id);if(!node)return;$('#search').value='';tasks.filter(t=>!t.parent_id&&t.id!==id).forEach(t=>collapsed.add(t.id));collapsed.delete(id);descendants(id).forEach(child=>collapsed.delete(child));render();if(isDayflow(node))await loadDayflow();
+ const node=tasks.find(t=>t.id===id);if(!node)return;focusedNode=id;$('#search').value='';tasks.filter(t=>!t.parent_id&&t.id!==id).forEach(t=>collapsed.add(t.id));collapsed.delete(id);descendants(id).forEach(child=>collapsed.delete(child));render();if(isDayflow(node))await loadDayflow();
  const row=[...document.querySelectorAll('.task-row')].find(el=>el.dataset.id===id);if(row)$('#chart').scrollTop=Math.max(0,row.offsetTop-$('.chart-head').offsetHeight);$('#chart').scrollLeft=Math.max(0,diff(node.start_date||today(),origin)*unit-100);
 }});
 load();
