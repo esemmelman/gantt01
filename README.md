@@ -18,7 +18,7 @@ The SQL schema is in `schema.sql` for reference and fresh installations; it has 
 
 ## Publishing
 
-The Dayflow node displays dated entries from DayFlow when expanded. It starts collapsed, loads entries in date/time order, and refreshes every minute while expanded and visible. Refresh also reloads the feed. Imported entries are read-only and remain owned by DayFlow; their bars represent their calendar dates. Names, dates, times, and colors are synchronized through a dedicated projection in the DayFlow project; notes and account details are excluded. `dayflow-feed.sql` documents the installed feed and synchronization trigger. Run `node verify-dayflow.cjs` to verify the integration without modifying entries.
+The Dayflow node displays dated entries from today onward from DayFlow when expanded. It starts collapsed, loads entries in date/time order, and refreshes every minute while expanded and visible. Refresh also reloads the feed. Imported entries remain owned by DayFlow; names and dates are read-only. Completion checkboxes are saved in the Gantt app, using native task progress or the isolated completion override table for imported entries. Completed bars have light red shading; their bars represent their calendar dates. Names, dates, times, and colors are synchronized through a dedicated projection in the DayFlow project; notes and account details are excluded. `dayflow-feed.sql` documents the installed feed and synchronization trigger. Run `node verify-dayflow.cjs` to verify the integration without modifying entries.
 
 GitHub Pages serves the root of the `main` branch. Push changes to `main` to publish them.
 

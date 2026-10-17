@@ -32,3 +32,12 @@ begin
  return new;
 end $$;
 create trigger gantt01_depth before insert or update of parent_id on public.gantt01_20261016_tasks for each row execute function public.gantt01_20261016_validate_depth();
+
+-- Completion overrides for imported DayFlow entries; native tasks use progress=100.
+create table public.gantt01_20261017_completion (
+ task_id text primary key, completed boolean not null default false
+);
+alter table public.gantt01_20261017_completion enable row level security;
+grant select,insert,update,delete on public.gantt01_20261017_completion to anon,authenticated;
+create policy gantt01_completion_shared on public.gantt01_20261017_completion
+ for all to anon,authenticated using(true) with check(true);
