@@ -19,3 +19,7 @@ The SQL schema is in `schema.sql` for reference and fresh installations; it has 
 ## Publishing
 
 GitHub Pages serves the root of the `main` branch. Push changes to `main` to publish them.
+
+## Verification
+
+Run `npm ci` and `npm test` with Microsoft Edge installed. The browser check exercises the connected database, creates a temporary task, verifies persistence and editing, drags its dates, and deletes it. It also checks collapse, search, CSV export, zoom, and mobile layout. For production verification, set `TEST_URL` to the live URL before running the test.
