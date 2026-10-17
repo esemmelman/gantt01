@@ -16,3 +16,5 @@ main{padding-top:24px}.toggle{font-size:23px;color:#64718e;line-height:1}.toggle
 .bar-tooltip{position:fixed;z-index:100;background:#293755;color:white;border-radius:7px;padding:10px 13px;font-size:14px;line-height:1.4;box-shadow:0 4px 18px #1f294533;pointer-events:none;max-width:min(440px,calc(100vw - 16px))}.bar-tooltip[hidden]{display:none}.hover-date-line{position:absolute;top:27px;bottom:0;width:2px;background:#5367e5;pointer-events:none;z-index:4}.day.hover-date{background:#e4e8ff;color:#4357d6;font-weight:700}
 
 .hover-date-line{background:rgba(83,103,229,.15);border-left:1px solid rgba(83,103,229,.35);border-right:1px solid rgba(83,103,229,.35)}
+
+body,body *{font-weight:700!important}

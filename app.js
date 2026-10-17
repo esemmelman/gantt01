@@ -50,7 +50,7 @@ $('#chart').addEventListener('pointermove',e=>{
  const bar=e.target.closest('[data-bar]');if(!bar||e.buttons||moving||busy){hideBarHover();return;}
  const t=tasks.find(t=>t.id===bar.dataset.bar);if(!t?.start_date)return;
  hideBarHover();const n=diff(t.start_date,today());
- hoverTip.textContent=String(n);hoverTip.hidden=false;bar.setAttribute('aria-describedby','bar-tooltip');
+ hoverTip.textContent=t.title+' · '+n;hoverTip.hidden=false;bar.setAttribute('aria-describedby','bar-tooltip');
  hoverTip.style.left=Math.max(8,Math.min(e.clientX+14,window.innerWidth-hoverTip.offsetWidth-8))+'px';hoverTip.style.top=Math.max(8,Math.min(e.clientY+18,window.innerHeight-hoverTip.offsetHeight-8))+'px';
  const inner=$('.chart-inner'),track=bar.parentElement;const line=document.createElement('div');line.className='hover-date-line';line.style.width=unit+'px';line.style.left=(track.getBoundingClientRect().left-inner.getBoundingClientRect().left+diff(t.start_date,origin)*unit)+'px';inner.append(line);
  const day=inner.querySelector('.day[title="'+t.start_date+'"]');day?.classList.add('hover-date');
