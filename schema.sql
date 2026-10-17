@@ -41,3 +41,14 @@ alter table public.gantt01_20261017_completion enable row level security;
 grant select,insert,update,delete on public.gantt01_20261017_completion to anon,authenticated;
 create policy gantt01_completion_shared on public.gantt01_20261017_completion
  for all to anon,authenticated using(true) with check(true);
+
+-- Rich documents and checklists for first-level nodes.
+create table public.gantt01_20261017_node_content (
+ node_id uuid primary key references public.gantt01_20261016_tasks(id) on delete cascade,
+ doc_html text not null default '',
+ checklist jsonb not null default '[]'::jsonb check(jsonb_typeof(checklist)='array')
+);
+alter table public.gantt01_20261017_node_content enable row level security;
+grant select,insert,update,delete on public.gantt01_20261017_node_content to anon,authenticated;
+create policy gantt01_node_content_shared on public.gantt01_20261017_node_content
+ for all to anon,authenticated using(true) with check(true);
