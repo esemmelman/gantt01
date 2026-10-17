@@ -3,11 +3,12 @@ create table public.gantt01_20261016_tasks (
  id uuid primary key default gen_random_uuid(),
  parent_id uuid references public.gantt01_20261016_tasks(id) on delete cascade,
  title text not null check(length(trim(title)) between 1 and 200),
- start_date date not null, end_date date not null,
+ start_date date, end_date date,
  progress integer not null default 0 check(progress between 0 and 100),
  color text not null default '#6172f3', sort_order bigint not null default 0,
  notes text not null default '', created_at timestamptz not null default now(),
- check(end_date >= start_date)
+ check(end_date >= start_date),
+ check ((start_date is null) = (end_date is null))
 );
 create index gantt01_20261016_parent_idx on public.gantt01_20261016_tasks(parent_id);
 alter table public.gantt01_20261016_tasks enable row level security;
