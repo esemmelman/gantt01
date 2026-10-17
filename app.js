@@ -45,7 +45,7 @@ function depth(t){let n=1;while(t.parent_id){t=tasks.find(x=>x.id===t.parent_id)
 function descendants(id){let result=[];for(const t of tasks.filter(x=>x.parent_id===id))result.push(t.id,...descendants(t.id));return result;}
 function scopedTasks(){if(!focusedNode)return tasks;const ids=new Set([focusedNode,...descendants(focusedNode)]);return tasks.filter(t=>ids.has(t.id));}
 function visible(){const rows=[],query=$('#search').value.toLowerCase().trim();const matches=new Set();if(query)for(const t of tasks.filter(t=>t.title.toLowerCase().includes(query))){matches.add(t.id);let p=t.parent_id;while(p){matches.add(p);p=tasks.find(t=>t.id===p)?.parent_id;}}
- function walk(parent,level){for(const t of tasks.filter(t=>t.parent_id===parent)){if(level===1&&focusedNode&&t.id!==focusedNode)continue;if(query&&!matches.has(t.id))continue;rows.push({...t,level});if(query||!collapsed.has(t.id))walk(t.id,level+1);}}walk(null,1);return rows;}
+ function walk(parent,level){for(const t of tasks.filter(t=>t.parent_id===parent).sort((a,b)=>Number(isDayflow(a))-Number(isDayflow(b))||a.title.localeCompare(b.title,undefined,{sensitivity:'base',numeric:true})||a.id.localeCompare(b.id))){if(level===1&&focusedNode&&t.id!==focusedNode)continue;if(query&&!matches.has(t.id))continue;rows.push({...t,level});if(query||!collapsed.has(t.id))walk(t.id,level+1);}}walk(null,1);return rows;}
 function render(){
  hideBarHover();
  nodeTools.closeMenu();
