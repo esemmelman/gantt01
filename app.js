@@ -49,10 +49,10 @@ function hideBarHover(){document.querySelector('.hover-date-line')?.remove();doc
 $('#chart').addEventListener('pointermove',e=>{
  const bar=e.target.closest('[data-bar]');if(!bar||e.buttons||moving||busy){hideBarHover();return;}
  const t=tasks.find(t=>t.id===bar.dataset.bar);if(!t?.start_date)return;
- hideBarHover();const n=diff(t.start_date,today());const relative=n===0?'Starts today':n>0?('Starts in '+n+' day'+(n===1?'':'s')):('Started '+Math.abs(n)+' day'+(n===-1?'':'s')+' ago');
- hoverTip.textContent=t.title+' · '+t.start_date+' · '+relative;hoverTip.hidden=false;bar.setAttribute('aria-describedby','bar-tooltip');
+ hideBarHover();const n=diff(t.start_date,today());
+ hoverTip.textContent=String(n);hoverTip.hidden=false;bar.setAttribute('aria-describedby','bar-tooltip');
  hoverTip.style.left=Math.max(8,Math.min(e.clientX+14,window.innerWidth-hoverTip.offsetWidth-8))+'px';hoverTip.style.top=Math.max(8,Math.min(e.clientY+18,window.innerHeight-hoverTip.offsetHeight-8))+'px';
- const inner=$('.chart-inner'),track=bar.parentElement;const line=document.createElement('div');line.className='hover-date-line';line.style.left=(track.getBoundingClientRect().left-inner.getBoundingClientRect().left+diff(t.start_date,origin)*unit+unit/2)+'px';inner.append(line);
+ const inner=$('.chart-inner'),track=bar.parentElement;const line=document.createElement('div');line.className='hover-date-line';line.style.width=unit+'px';line.style.left=(track.getBoundingClientRect().left-inner.getBoundingClientRect().left+diff(t.start_date,origin)*unit)+'px';inner.append(line);
  const day=inner.querySelector('.day[title="'+t.start_date+'"]');day?.classList.add('hover-date');
 });
 $('#chart').addEventListener('pointerleave',hideBarHover);$('#chart').addEventListener('pointerdown',hideBarHover);$('#chart').addEventListener('scroll',hideBarHover);
