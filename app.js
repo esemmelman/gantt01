@@ -1,7 +1,7 @@
 import {setupNodeTools} from './node-tools.js?v=1.8.0';
 const API = 'https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_20261016_tasks';
-const DAYFLOW_API='https://ynfjfanvdvpyycoeweca.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
-const DAYFLOW_KEY='sb_publishable_j7q6Ox0GVsUv68D3oQiOBA_2Avx50il';
+const DAYFLOW_API='https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
+const DAYFLOW_KEY='sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';
 let dayflowLoading=false,dayflowCompleted=new Map();
 const isDayflow=t=>!t.external&&(t.id==='2ef54192-bae1-4129-9aec-16b0c3f4d0e9'||t.title.trim().toLowerCase()==='dayflow');
 const KEY = 'sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';

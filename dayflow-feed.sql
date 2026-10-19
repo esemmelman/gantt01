@@ -1,3 +1,4 @@
+-- Historical source setup. As of 2026-10-19 the live feed and ownership-mapped trigger are in bnaimitzvah (fgomaujsdblpzxhnnqrg). Do not run this file against the consolidated project.
 -- Applied to the DayFlow project (ynfjfanvdvpyycoeweca), not bnaimitzvah.
 -- Public, read-only projection of the owner's dated DayFlow entries.
 create table public.gantt01_dayflow_dated_20261017 (
