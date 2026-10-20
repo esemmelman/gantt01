@@ -1,5 +1,5 @@
-import {setupNodeDrag} from './node-drag.js?v=1.9.1';
-import {setupNodeTools} from './node-tools.js?v=1.9.1';
+import {setupNodeDrag} from './node-drag.js?v=1.9.2';
+import {setupNodeTools} from './node-tools.js?v=1.9.2';
 const API = 'https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_20261016_tasks';
 const DAYFLOW_API='https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
 const DAYFLOW_KEY='sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';
@@ -107,7 +107,7 @@ $('#chart').addEventListener('pointermove',e=>{
 $('#chart').addEventListener('pointerleave',hideBarHover);$('#chart').addEventListener('pointerdown',hideBarHover);$('#chart').addEventListener('scroll',hideBarHover);
 $('#show-all').onchange=e=>{nearTermOnly=e.target.value!=='all';if(nearTermOnly)rangeDays=Number(e.target.value);collapseTree();render();$('#today').click();};
 $('#all-nodes').onclick=()=>{focusedNode=null;collapseTree();render();$('#today').click();};
-const nodeTools=setupNodeTools({api:API,key:KEY,getNode:id=>tasks.find(t=>t.id===id),onEdit:openEditor,getDepth:depth,onAddSibling:id=>openEditor(null,tasks.find(t=>t.id===id).parent_id),onAddChild:id=>openEditor(null,id),onGantt:async id=>{
+const nodeTools=setupNodeTools({api:API,key:KEY,getNode:id=>tasks.find(t=>t.id===id),onEdit:openEditor,getDepth:depth,onAddSibling:id=>{const node=tasks.find(t=>t.id===id);openEditor(null,node.parent_id||node.id);},onAddChild:id=>openEditor(null,id),onGantt:async id=>{
  const node=tasks.find(t=>t.id===id);if(!node)return;focusedNode=id;expandedRoot=null;$('#search').value='';tasks.filter(t=>!t.parent_id&&t.id!==id).forEach(t=>collapsed.add(t.id));collapsed.delete(id);descendants(id).forEach(child=>collapsed.delete(child));render();if(isDayflow(node))await loadDayflow();
  const row=[...document.querySelectorAll('.task-row')].find(el=>el.dataset.id===id);if(isAndroid){row?.scrollIntoView({block:'start',behavior:'smooth'});return;}if(row)$('#chart').scrollTop=Math.max(0,row.offsetTop-$('.chart-head').offsetHeight);$('#chart').scrollLeft=Math.max(0,diff(node.start_date||today(),origin)*unit-100);
 }});
