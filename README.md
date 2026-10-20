@@ -35,3 +35,5 @@ On Android, the timeline is rendered as a document-style list of nodes with date
 Drag a node name to move it and its subtree. Drop near the top or bottom of a node to reorder siblings, in the middle to nest it, or on ← All nodes to move it to the top level. Moves persist, respect the four-level limit, and prevent cycles. DayFlow entries cannot be moved. Siblings now follow saved order.
 
 Link in the node menu opens a saved URL in a new tab, or asks for a URL when none is saved. Links are shared and persist with each node. Use Edit → Link URL to change or remove a link. Only HTTP and HTTPS URLs are accepted.
+
+The node-level dropdown shows every branch through the selected level (1st through 4th). Selecting a level exits a focused branch and clears search; the task date filter remains in effect. Individual branches can still be expanded or collapsed.
