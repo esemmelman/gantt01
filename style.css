@@ -44,3 +44,5 @@ body,body *{font-weight:700!important}
 .rail{width:116px;padding:24px 8px}.rail #all-nodes{padding:9px 7px;white-space:nowrap;color:#5968dd;font-size:14px}main{margin-left:116px}@media(max-width:650px){.rail{width:96px}.rail #all-nodes{font-size:12px;padding:8px 4px}main{margin-left:96px}}.android-document .rail{display:flex;position:static;width:100%;padding:12px 12px 0;align-items:flex-start;border:0}.android-document .rail-bottom{display:none}.android-document main{margin-left:0}
 
 .node-drag{touch-action:none;cursor:grab;border:0;background:transparent;color:#929bb0;padding:2px;font-size:16px;flex-shrink:0}.node-drag:active{cursor:grabbing}.task-row.drop-before{box-shadow:0 -3px #6271e9}.task-row.drop-after{box-shadow:0 3px #6271e9}.task-row.drop-child .task-left,#all-nodes.drop-child{background:#e6eaff;outline:2px solid #6271e9;outline-offset:-2px}
+
+main{margin-left:0}@media(max-width:650px){main{margin-left:0}}.task-name[data-drag]{touch-action:none;cursor:grab}.task-name[data-drag]:active{cursor:grabbing}

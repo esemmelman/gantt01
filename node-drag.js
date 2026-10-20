@@ -1,5 +1,6 @@
 export function setupNodeDrag({getTasks,depth,descendants,isDayflow,isBusy,setBusy,request,load,prepare,status,error}){
- let drag=null;
+ let drag=null,suppressClick=false;
+ document.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopImmediatePropagation();}},true);
  const clear=()=>{document.querySelectorAll('.drop-before,.drop-after,.drop-child').forEach(el=>el.classList.remove('drop-before','drop-after','drop-child'));};
  function plan(event){
   const tasks=getTasks(),node=tasks.find(t=>t.id===drag.id),root=event.target.closest('#all-nodes'),row=event.target.closest('.task-left')?.closest('.task-row');
@@ -27,7 +28,7 @@ export function setupNodeDrag({getTasks,depth,descendants,isDayflow,isBusy,setBu
   };
   const finish=async event=>{
    handle.removeEventListener('pointermove',move);handle.removeEventListener('pointerup',finish);handle.removeEventListener('pointercancel',cancel);
-   const hit=document.elementFromPoint(event.clientX,event.clientY),next=drag?.active&&hit&&plan({target:hit,clientY:event.clientY});drag=null;clear();
+   const hit=document.elementFromPoint(event.clientX,event.clientY),next=drag?.active&&hit&&plan({target:hit,clientY:event.clientY});suppressClick=!!drag?.active;setTimeout(()=>suppressClick=false,0);drag=null;clear();
    if(!next)return;
    setBusy(true);status('Moving node…');
    try{
