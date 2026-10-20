@@ -33,3 +33,5 @@ Run `npm ci` and `npm test` with Microsoft Edge installed. The browser check exe
 On Android, the timeline is rendered as a document-style list of nodes with dates beside them. Hierarchy controls, completion, node menus, and DayFlow times remain available. Other platforms retain the Gantt chart. Run `node verify-android.cjs` for Android emulation and desktop comparison.
 
 Drag a node name to move it and its subtree. Drop near the top or bottom of a node to reorder siblings, in the middle to nest it, or on ← All nodes to move it to the top level. Moves persist, respect the four-level limit, and prevent cycles. DayFlow entries cannot be moved. Siblings now follow saved order.
+
+Link in the node menu opens a saved URL in a new tab, or asks for a URL when none is saved. Links are shared and persist with each node. Use Edit → Link URL to change or remove a link. Only HTTP and HTTPS URLs are accepted.

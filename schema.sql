@@ -52,3 +52,6 @@ alter table public.gantt01_20261017_node_content enable row level security;
 grant select,insert,update,delete on public.gantt01_20261017_node_content to anon,authenticated;
 create policy gantt01_node_content_shared on public.gantt01_20261017_node_content
  for all to anon,authenticated using(true) with check(true);
+
+-- Added in v1.9.3, already applied.
+alter table public.gantt01_20261016_tasks add column link_url text not null default '' check (link_url = '' or link_url ~* '^https?://[^[:space:]]+$');
