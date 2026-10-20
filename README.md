@@ -31,3 +31,5 @@ GitHub Pages serves the root of the `main` branch. Push changes to `main` to pub
 Run `npm ci` and `npm test` with Microsoft Edge installed. The browser check exercises the connected database, creates a temporary task, verifies persistence and editing, drags its dates, and deletes it. It also checks collapse, search, CSV export, zoom, and mobile layout. For production verification, set `TEST_URL` to the live URL before running the test.
 
 On Android, the timeline is rendered as a document-style list of nodes with dates beside them. Hierarchy controls, completion, node menus, and DayFlow times remain available. Other platforms retain the Gantt chart. Run `node verify-android.cjs` for Android emulation and desktop comparison.
+
+Drag the grip beside a node to move it and its subtree. Drop near the top or bottom of a node to reorder siblings, in the middle to nest it, or on ← All nodes to move it to the top level. Moves persist, respect the four-level limit, and prevent cycles. DayFlow entries cannot be moved. Siblings now follow saved order.

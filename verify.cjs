@@ -2,7 +2,7 @@ const { chromium } = require('@playwright/test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
 const fs = require('node:fs');
-const server = http.createServer((req,res)=>{const file=req.url.split('?')[0]==='/'?'index.html':req.url.split('?')[0].slice(1);if(!['index.html','app.js','style.css','node-tools.js'].includes(file)){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file));});
+const server = http.createServer((req,res)=>{const file=req.url.split('?')[0]==='/'?'index.html':req.url.split('?')[0].slice(1);if(!['index.html','app.js','style.css','node-tools.js','node-drag.js'].includes(file)){res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file));});
 (async()=>{await new Promise(r=>server.listen(0,r));const browser=await chromium.launch({headless:true,channel:'msedge'});const page=await browser.newPage({viewport:{width:1440,height:1000}});let failures=[];page.on('pageerror',e=>failures.push(e.message));
 try{
  await page.goto(process.env.TEST_URL||'http://localhost:'+server.address().port);await page.waitForFunction(()=>document.querySelector('#status').textContent==='All changes saved');
