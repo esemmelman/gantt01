@@ -1,4 +1,4 @@
-import {setupNodeTools} from './node-tools.js?v=1.8.1';
+import {setupNodeTools} from './node-tools.js?v=1.8.2';
 const API = 'https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_20261016_tasks';
 const DAYFLOW_API='https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
 const DAYFLOW_KEY='sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';
