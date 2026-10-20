@@ -46,3 +46,5 @@ body,body *{font-weight:700!important}
 .node-drag{touch-action:none;cursor:grab;border:0;background:transparent;color:#929bb0;padding:2px;font-size:16px;flex-shrink:0}.node-drag:active{cursor:grabbing}.task-row.drop-before{box-shadow:0 -3px #6271e9}.task-row.drop-after{box-shadow:0 3px #6271e9}.task-row.drop-child .task-left,#all-nodes.drop-child{background:#e6eaff;outline:2px solid #6271e9;outline-offset:-2px}
 
 main{margin-left:0}@media(max-width:650px){main{margin-left:0}}.task-name[data-drag]{touch-action:none;cursor:grab}.task-name[data-drag]:active{cursor:grabbing}
+
+.month,.month span,.weekday,.date-number{font-weight:900!important;color:#414d66}

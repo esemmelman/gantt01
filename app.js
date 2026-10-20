@@ -1,5 +1,5 @@
-import {setupNodeDrag} from './node-drag.js?v=1.9.0';
-import {setupNodeTools} from './node-tools.js?v=1.9.0';
+import {setupNodeDrag} from './node-drag.js?v=1.9.1';
+import {setupNodeTools} from './node-tools.js?v=1.9.1';
 const API = 'https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_20261016_tasks';
 const DAYFLOW_API='https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
 const DAYFLOW_KEY='sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';
