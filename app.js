@@ -1,4 +1,4 @@
-import {setupNodeTools} from './node-tools.js?v=1.8.2';
+import {setupNodeTools} from './node-tools.js?v=1.8.3';
 const API = 'https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_20261016_tasks';
 const DAYFLOW_API='https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
 const DAYFLOW_KEY='sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';
@@ -60,7 +60,7 @@ function render(){
  if(focusedNode&&!tasks.some(t=>t.id===focusedNode&&!t.parent_id))focusedNode=null;
  $('#show-all').hidden=!!focusedNode;$('#show-all').textContent=nearTermOnly?'Show all':'Current + 10 days';$('#show-all').setAttribute('aria-pressed',String(nearTermOnly));
  if(expandedRoot&&!tasks.some(t=>t.id===expandedRoot&&!t.parent_id&&!collapsed.has(t.id)))expandedRoot=null;
- $('#gantt-scope').hidden=!(focusedNode||expandedRoot);$('#scope-title').textContent=tasks.find(t=>t.id===(focusedNode||expandedRoot))?.title||'';
+
  const dates=scopedTasks().flatMap(t=>[t.start_date,t.end_date]).filter(Boolean);dates.push(today());dates.sort();origin=shift(dates[0],-5);count=Math.max(60,diff(dates.at(-1),origin)+15,diff(today(),origin)+Math.ceil($('#chart').clientWidth/unit));const width=count*unit;
  const rows=visible();const expanded=rows.some(t=>(isDayflow(t)||tasks.some(c=>c.parent_id===t.id))&&(!collapsed.has(t.id)||$('#search').value.trim()));$('#expand').textContent=expanded?'Collapse all':'Expand all';$('#expand').setAttribute('aria-expanded',String(expanded));if(isAndroid){renderAndroid(rows);return;}let days='',months='';let last='';for(let i=0;i<count;i++){const s=shift(origin,i),d=date(s),month=d.toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});if(month!==last){let span=0;while(i+span<count&&date(shift(origin,i+span)).getUTCMonth()===d.getUTCMonth())span++;months+=`<span style="display:inline-block;width:${span*unit}px;padding-left:10px;border-right:1px solid #e9ecf3">${esc(month)}</span>`;last=month;}days+=`<div class="day ${[0,6].includes(d.getUTCDay())?'weekend':''} ${s===today()?'is-today':''}" style="width:${unit}px" data-date="${s}" aria-label="${s}"><span class="weekday">${unit>=16||d.getUTCDate()===1?'SMTWTFS'[d.getUTCDay()]:''}</span><span class="date-number">${unit>=16?d.getUTCDate():(d.getUTCDate()===1?'1':'')}</span></div>`;}
  const marker=diff(today(),origin)*unit+unit/2;

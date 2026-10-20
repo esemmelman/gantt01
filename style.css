@@ -40,3 +40,5 @@ body,body *{font-weight:700!important}
 .toolbar{justify-content:flex-start}.task-name.root-name{font-size:20px}.node-menu{flex-wrap:wrap;max-width:calc(100vw - 16px)}.node-menu button[hidden]{display:none}.android-document .task-name.root-name{font-size:20px}@media(max-width:650px){.task-name.root-name,.android-document .task-name.root-name{font-size:18px}}
 
 .task-row + .task-row:has(.root-name){margin-top:12px}
+
+.rail{width:116px;padding:24px 8px}.rail #all-nodes{padding:9px 7px;white-space:nowrap;color:#5968dd;font-size:14px}main{margin-left:116px}@media(max-width:650px){.rail{width:96px}.rail #all-nodes{font-size:12px;padding:8px 4px}main{margin-left:96px}}.android-document .rail{display:flex;position:static;width:100%;padding:12px 12px 0;align-items:flex-start;border:0}.android-document .rail-bottom{display:none}.android-document main{margin-left:0}
