@@ -1,5 +1,5 @@
-import {setupNodeDrag} from './node-drag.js?v=1.8.6';
-import {setupNodeTools} from './node-tools.js?v=1.8.6';
+import {setupNodeDrag} from './node-drag.js?v=1.8.7';
+import {setupNodeTools} from './node-tools.js?v=1.8.7';
 const API = 'https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_20261016_tasks';
 const DAYFLOW_API='https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
 const DAYFLOW_KEY='sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';
@@ -87,7 +87,7 @@ $('#export').onclick=()=>{const columns=['title','parent_id','start_date','end_d
 const hoverTip=document.createElement('div');hoverTip.className='bar-tooltip';hoverTip.id='bar-tooltip';hoverTip.setAttribute('role','tooltip');hoverTip.hidden=true;document.body.append(hoverTip);
 function hideBarHover(){document.querySelector('.hover-date-line')?.remove();document.querySelector('.hover-date')?.classList.remove('hover-date');document.querySelector('[aria-describedby="bar-tooltip"]')?.removeAttribute('aria-describedby');document.querySelector('#bar-tooltip')?.setAttribute('hidden','');}
 $('#chart').addEventListener('pointermove',e=>{
- const root=e.target.closest('.task-left:has(.root-name)'),rootNode=root?tasks.find(t=>t.id===root.closest('.task-row').dataset.id):null;
+ const root=e.target.closest('.task-left'),rootNode=root?tasks.find(t=>t.id===root.closest('.task-row').dataset.id):null;
  if(rootNode&&!e.buttons&&!moving&&!busy){
   hideBarHover();const ids=new Set([rootNode.id,...descendants(rootNode.id)]),dates=tasks.filter(t=>ids.has(t.id)).map(t=>t.start_date).filter(Boolean).sort();
   const away=s=>{const n=diff(s,today());return n<0?`${Math.abs(n)} days ago`:n===0?'Today':`${n} days away`;};
