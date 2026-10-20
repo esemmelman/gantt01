@@ -1,5 +1,5 @@
-import {setupNodeDrag} from './node-drag.js?v=1.9.3';
-import {setupNodeTools} from './node-tools.js?v=1.9.3';
+import {setupNodeDrag} from './node-drag.js?v=1.9.4';
+import {setupNodeTools} from './node-tools.js?v=1.9.4';
 const API = 'https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_20261016_tasks';
 const DAYFLOW_API='https://fgomaujsdblpzxhnnqrg.supabase.co/rest/v1/gantt01_dayflow_dated_20261017';
 const DAYFLOW_KEY='sb_publishable_JOUqLZDnfGu_yCa6k6FVDQ_AYwpr72i';
@@ -73,7 +73,7 @@ function openEditor(id=null,parent=null){if(tasks.find(t=>t.id===id)?.external)r
  const excluded=new Set(id?[id,...descendants(id)]:[]);form.elements.parent_id.innerHTML='<option value="">None — top-level task</option>'+tasks.filter(x=>!x.external&&!excluded.has(x.id)&&depth(x)<4).map(x=>`<option value="${x.id}">${esc('　'.repeat(depth(x)-1)+x.title)}</option>`).join('');
  for(const [k,v] of Object.entries(t||{title:'',parent_id:parent||'',start_date:today(),end_date:shift(today(),6),progress:0,color:tasks.find(t=>t.id===parent)?.color||'#6172f3',notes:'',link_url:''})){if(k!=='parent_id'&&form.elements[k])form.elements[k].value=v??'';}
  form.elements.parent_id.value=t?t.parent_id||'':parent||'';
- form.elements.completed.checked=t?.progress===100;form.elements.no_date.checked=!!t&&!t.start_date;syncDates();
+ form.elements.completed.checked=t?.progress===100;form.elements.no_date.checked=!t||!t.start_date;syncDates();
  $('#editor').showModal();form.elements.title.focus();}
 function syncDates(){const f=$('#task-form').elements;for(const name of ['start_date','end_date']){f[name].disabled=f.no_date.checked;f[name].required=!f.no_date.checked;if(!f.no_date.checked&&!f[name].value)f[name].value=today();}}
 $('#task-form').elements.no_date.onchange=syncDates;
